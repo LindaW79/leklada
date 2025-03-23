@@ -1,110 +1,99 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Game Kortlek</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f7f7f7;
-        }
-        h1 {
-            color: #333;
-        }
-        #deck {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #deck:hover {
-            transform: scale(1.05);
-        }
-        .card {
-            background-color: #ffcc00;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 8px;
-            display: inline-block;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-size: 16px;
-        }
-        #table {
-            margin-top: 20px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Game Kortlek</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f7f7f7;
+    }
+    h1 {
+      color: #333;
+    }
+    #deck {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    #deck:hover {
+      transform: scale(1.05);
+    }
+    .card {
+      background-color: #ffcc00;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 8px;
+      display: inline-block;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-size: 16px;
+    }
+    #table {
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h1>AI-Game 🎴</h1>
-    <p>Klicka på kortleken för att dra ett AI-uppdrag!</p>
-    
-    <div id="deck">🃏 Klicka för att dra ett kort</div>
+  <h1>AI-Game 🎴</h1>
+  <p>Klicka på kortleken för att dra ett AI-uppdrag från ChatGPT!</p>
 
-    <div id="table">
-        <h2>Dina dragna kort:</h2>
-        <div id="drawn-cards"></div>
-    </div>
+  <div id="deck">🃏 Klicka för att dra ett kort</div>
 
-    <button onclick="resetGame()">Återställ kortleken</button>
+  <div id="table">
+    <h2>Dina dragna kort:</h2>
+    <div id="drawn-cards"></div>
+  </div>
 
-    <script>
-        const tasks = [
-            "Skapa en bild med ett AI-verktyg (t.ex. DALL·E, Midjourney)",
-            "Använd ChatGPT för att brainstorma idéer till en berättelse",
-            "Bygg en enkel chatbot med en AI-API",
-            "Skapa en AI-genererad musikbit",
-            "Testa ett AI-verktyg för att förbättra bilder",
-            "Låt en AI översätta en text och kontrollera resultatet",
-            "Använd AI för att sammanfatta en lång artikel",
-            "Gör en röstkloning med AI och spela upp den",
-            "Generera kod med AI och testa den",
-            "Använd ett AI-verktyg för att förbättra en video"
-        ];
+  <button onclick="resetGame()">Återställ kortleken</button>
 
-        let drawnTasks = new Set();
+  <script>
+    async function fetchTaskFromServer() {
+      const response = await fetch("/.netlify/functions/chatgpt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Hitta på ett AI-relaterat uppdrag som är kreativt, beskrivande och lite utmanande."
+        })
+      });
 
-        document.getElementById("deck").addEventListener("click", function() {
-            if (drawnTasks.size === tasks.length) {
-                alert("Alla kort är dragna! Återställ för en ny omgång.");
-                return;
-            }
+      const data = await response.json();
+      return data.message;
+    }
 
-            let newTask;
-            do {
-                newTask = tasks[Math.floor(Math.random() * tasks.length)];
-            } while (drawnTasks.has(newTask));
+    document.getElementById("deck").addEventListener("click", async function () {
+      const task = await fetchTaskFromServer();
 
-            drawnTasks.add(newTask);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.textContent = task;
+      document.getElementById("drawn-cards").appendChild(card);
+    });
 
-            const card = document.createElement("div");
-            card.className = "card";
-            card.textContent = newTask;
-            document.getElementById("drawn-cards").appendChild(card);
-        });
-
-        function resetGame() {
-            drawnTasks.clear();
-            document.getElementById("drawn-cards").innerHTML = "";
-        }
-    </script>
+    function resetGame() {
+      document.getElementById("drawn-cards").innerHTML = "";
+    }
+  </script>
 </body>
 </html>
