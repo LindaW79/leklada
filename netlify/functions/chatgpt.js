@@ -42,7 +42,7 @@ exports.handler = async function(event) {
     console.error("❌ Fel vid anrop till OpenAI:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Kunde inte hämta uppdrag från OpenAI." })
+      body: JSON.stringify({ message: data.choices?.[0]?.message?.content || "OpenAI svarade inte som förväntat." })
     };
   }
 };
